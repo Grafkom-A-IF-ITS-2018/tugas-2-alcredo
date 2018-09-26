@@ -111,6 +111,21 @@
       var numb
       var numb2
 
+      function matrixTranslation(mat,x,y,z){
+        for(var i=0;i<mat.length/3;i++)
+        {
+          mat[i*3]+=x
+          mat[i*3+1]+=y
+          mat[i*3+2]+=z
+        }
+        return mat
+      }
+
+      function matrixRotation(mat,degree,rotCoreX,rotCoreY){
+
+      }
+
+
       function initBuffers() {
         // Triangle Position
         triangleVertexPositionBuffer = gl.createBuffer()
@@ -135,6 +150,7 @@
         1.0, -0.6, 0.0,
         -0.4, -0.6, 0.0
         ]
+
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
         numb = vertices.length/3
         triangleVertexPositionBuffer.itemSize = 3
@@ -154,25 +170,32 @@
         squareVertexPositionBuffer = gl.createBuffer()
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer)
         vertices = [
-          1.0,  1.0,  0.0,
-          1.0, 0.6, 0.0,
-          -1.0, 1.0, 0.0,
-          -0.6, 0.6, 0.0,
-          -0.6, 0.2, 0.0,
-          -1.0, 1.0, 0.0,
-          -1.0, -1.0 ,0.0,
-          -0.6, 0.2, 0.0,
-          -0.6, -0.2, 0.0,
-          1.0, -0.2, 0.0,
-          1.0, 0.2, 0.0,
-          -0.6, 0.2, 0.0,
-          -0.6, -0.2, 0.0,
-          -0.6, -0.6, 0.0,
-          -1.0, -1.0, 0.0,
-          1.0, -1.0, 0.0,
-          -0.6, -0.6, 0.0,
-          1.0, -0.6, 0.0
+          1.0, 1.0, 1.0,
+          1.0, -1.0, 1.0,
+          -1.0, 1.0, 1.0,
+          -1.0, -1.0, 1.0,
+          -1.0, -1.0, 1.0,
+          1.0, -1.0, 1.0,
+          1.0, 1.0, 1.0,
+          -1.0, 1.0, 1.0,
+          1.0, 1.0, -1.0,
+          1.0, -1.0, -1.0,
+          -1.0, 1.0, -1.0,
+          -1.0, -1.0, -1.0,
+          -1.0, -1.0, -1.0,
+          1.0, -1.0, -1.0,
+          1.0, 1.0, -1.0,
+          -1.0, 1.0, -1.0,
+          1.0, 1.0, 1.0,
+          1.0, 1.0, -1.0,
+          1.0, -1.0, 1.0,
+          1.0, -1.0, -1.0,
+          -1.0, 1.0, 1.0,
+          -1.0, 1.0, -1.0,
+          -1.0, -1.0, 1.0,
+          -1.0, -1.0, -1.0
         ]
+
         numb2 = vertices.length/3
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
         squareVertexPositionBuffer.itemSize = 3
@@ -223,7 +246,7 @@
         mat4.identity(mvMatrix)
         mat4.translate(mvMatrix, mvMatrix, [0.0, 2.0, -10.0])
         mvPushMatrix()
-        mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rTri), [0.0, 1.0, 0.0])
+        //mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rTri), [0.0, 1.0, 0.0])
         //mat4.rotateY(mvMatrix, mvMatrix, glMatrix.toRadian(rTri))
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer)
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
@@ -234,14 +257,14 @@
         mvPopMatrix()
         mat4.translate(mvMatrix, mvMatrix, [0.0, -4, 0.0])
         mvPushMatrix()
-        mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare), [1.0, 0.0, 0.0])
+        //mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare), [1.0, 0.0, 0.0])
         //mat4.rotateX(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare))
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer)
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer)
         gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0)
         setMatrixUniforms()
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems)
+        gl.drawArrays(gl.LINES, 0, squareVertexPositionBuffer.numItems)
         mvPopMatrix()
       }
       var lastTime = 0
