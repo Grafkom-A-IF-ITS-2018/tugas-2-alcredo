@@ -85,14 +85,17 @@
         shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, 'uPMatrix')
         shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, 'uMVMatrix')
       }
+      
       var mvMatrix = mat4.create()
       var mvMatrixStack = []
       var pMatrix = mat4.create()
+
       function mvPushMatrix() {
         var copy = mat4.create()
         mat4.copy(copy, mvMatrix)
         mvMatrixStack.push(copy)
       }
+
       function mvPopMatrix() {
         if (mvMatrixStack.length == 0) {
           throw "Tumpukan matriks kosong"
@@ -111,7 +114,7 @@
       var numb
       var numb2
 
-      function matrixTranslation(mat,x,y,z){
+      function matrixTranslating(mat,x,y,z){
         for(var i=0;i<mat.length/3;i++)
         {
           mat[i*3]+=x
@@ -121,8 +124,20 @@
         return mat
       }
 
-      function matrixRotation(mat,degree,rotCoreX,rotCoreY){
+      function matrixScaling(mat,size){
+        for(var i=0;i<mat.length;i++)mat[i]*=size
+        return mat
+      }
 
+      function matrixRotating(mat,deg,xCore,yCore)
+      {
+        degRad = deg * (Math.PI/180)
+        for(var i=0;i<mat.length/3;i++)
+        {
+          mat[i*3]=Math.cos(degRad)*(mat[i*3]-xCore)-Math.sin(degRad)*(mat[i*3+2]-yCore)
+          mat[i*3+2]=Math.sin(degRad)*(mat[i*3]-xCore)+Math.cos(degRad)*(mat[i*3+2]-yCore)
+        }
+        return mat
       }
 
 
