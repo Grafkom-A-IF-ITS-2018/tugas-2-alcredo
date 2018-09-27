@@ -106,13 +106,11 @@
         gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix)
         gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix)
       }
-      var triangleVertexPositionBuffer
-      var triangleVertexColorBuffer
-      var squareVertexPositionBuffer
-      var squareVertexColorBuffer
+      var letterVertexPositionBuffer
+      var letterVertexColorBuffer
+      var cubeVertexPositionBuffer
+      var cubeVertexColorBuffer
 
-      var numb
-      var numb2
 
       function matrixTranslating(mat,x,y,z){
         for(var i=0;i<mat.length/3;i++)
@@ -134,18 +132,21 @@
         degRad = deg * (Math.PI/180)
         for(var i=0;i<mat.length/3;i++)
         {
-          mat[i*3]=Math.cos(degRad)*(mat[i*3]-xCore)-Math.sin(degRad)*(mat[i*3+2]-yCore)
-          mat[i*3+2]=Math.sin(degRad)*(mat[i*3]-xCore)+Math.cos(degRad)*(mat[i*3+2]-yCore)
+          mat[i*3]=Math.cos(degRad)*(mat[i*3]-xCore)-Math.sin(degRad)*(mat[i*3+2]-yCore) +xCore
+          mat[i*3+2]=Math.sin(degRad)*(mat[i*3]-xCore)+Math.cos(degRad)*(mat[i*3+2]-yCore) +yCore
         }
         return mat
       }
 
-
+      var letterVerticesCount = 0
+      var cubeVerticesCount = 0
+      var vertices1 = []
+      var vertices2 = []
       function initBuffers() {
-        // Triangle Position
-        triangleVertexPositionBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer)
-        var vertices = [
+        // letter Position
+        letterVertexPositionBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, letterVertexPositionBuffer)
+        vertices1 = [
         1.0,  1.0,  0.0,
         1.0 , 0.6, 0.0,
         -0.6, 1.0, 0.0,
@@ -165,26 +166,27 @@
         1.0, -0.6, 0.0,
         -0.4, -0.6, 0.0
         ]
+        
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1), gl.STATIC_DRAW)
+        letterVerticesCount = vertices1.length/3
+        letterVertexPositionBuffer.itemSize = 3
+        letterVertexPositionBuffer.numItems = letterVerticesCount
 
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-        numb = vertices.length/3
-        triangleVertexPositionBuffer.itemSize = 3
-        triangleVertexPositionBuffer.numItems = numb
-        // Triangle Color
-        triangleVertexColorBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer)
+        // letter Color
+        letterVertexColorBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, letterVertexColorBuffer)
         var color = []
-        for (var i=0; i < numb; i++) {
+        for (var i=0; i < letterVerticesCount; i++) {
             color = color.concat([Math.random(),Math.random(),Math.random(), 1.0]);
         }
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color), gl.STATIC_DRAW)
-        triangleVertexColorBuffer.itemSize = 4
-        triangleVertexColorBuffer.numItems = numb
+        letterVertexColorBuffer.itemSize = 4
+        letterVertexColorBuffer.numItems = letterVerticesCount
 
-        // Square Position
-        squareVertexPositionBuffer = gl.createBuffer()
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer)
-        vertices = [
+        // cube Position
+        cubeVertexPositionBuffer = gl.createBuffer()
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer)
+        vertices2 = [
           1.0, 1.0, 1.0,
           1.0, -1.0, 1.0,
           -1.0, 1.0, 1.0,
@@ -211,46 +213,60 @@
           -1.0, -1.0, -1.0
         ]
 
-        numb2 = vertices.length/3
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
-        squareVertexPositionBuffer.itemSize = 3
-        squareVertexPositionBuffer.numItems = numb2
-        // Square Color
-        squareVertexColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+        vertices2 = matrixScaling(vertices2,3)
+
+        cubeVerticesCount = vertices2.length/3
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices2), gl.STATIC_DRAW)
+        cubeVertexPositionBuffer.itemSize = 3
+        cubeVertexPositionBuffer.numItems = cubeVerticesCount
+        // cube Color
+        cubeVertexColorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
         var colors = [];
-        for (var i=0; i < numb2; i++) {
+        for (var i=0; i < cubeVerticesCount; i++) {
             colors = colors.concat([Math.random(),Math.random(),Math.random(), 1.0]);
         }
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-        squareVertexColorBuffer.itemSize = 4;
-        squareVertexColorBuffer.numItems = numb2;
+        cubeVertexColorBuffer.itemSize = 4;
+        cubeVertexColorBuffer.numItems = cubeVerticesCount;
       }
       var rTri = 0
-      var rSquare = 0
+      var rcube = 0
 
-      var temp
-      var last = -1
+      var temp = -503
+      var last = -505
       function changeColor()
       {
         temp = Math.floor((rTri%360)/30)
         if(temp != last )
         {
-          last = temp 
-          gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer)
+          last = temp
+          gl.bindBuffer(gl.ARRAY_BUFFER, letterVertexColorBuffer)
           var color = []
-          for (var i=0; i < numb; i++) {
+          for (var i=0; i < letterVerticesCount; i++) {
               color = color.concat([Math.random(),Math.random(),Math.random(), 1.0]);
           }
           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(color), gl.STATIC_DRAW)
 
-          gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer);
+          gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer);
           var colors = [];
-          for (var i=0; i < numb2; i++) {
+          for (var i=0; i < cubeVerticesCount; i++) {
               colors = colors.concat([Math.random(),Math.random(),Math.random(), 1.0]);
           }
           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
         }
+      }
+
+      function letterRotate()
+      {
+        gl.bindBuffer(gl.ARRAY_BUFFER, letterVertexPositionBuffer)
+        vertices1 = matrixRotating(vertices1,1.0,0,0)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices1), gl.STATIC_DRAW)
+      }
+
+      function letterTranslate()
+      {
+
       }
 
       function drawScene() {
@@ -259,28 +275,29 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
         mat4.perspective(pMatrix, glMatrix.toRadian(60), gl.viewportWidth / gl.viewportHeight, 0.1, 100.0)
         mat4.identity(mvMatrix)
-        mat4.translate(mvMatrix, mvMatrix, [0.0, 2.0, -10.0])
-        mvPushMatrix()
+
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -10.0])
+        //mvPushMatrix()
         //mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rTri), [0.0, 1.0, 0.0])
         //mat4.rotateY(mvMatrix, mvMatrix, glMatrix.toRadian(rTri))
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer)
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
-        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexColorBuffer)
-        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, triangleVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0)
+        letterRotate()
+        //gl.bindBuffer(gl.ARRAY_BUFFER, letterVertexPositionBuffer)
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, letterVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
+        gl.bindBuffer(gl.ARRAY_BUFFER, letterVertexColorBuffer)
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, letterVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0)
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, letterVertexPositionBuffer.numItems)
+        //mvPopMatrix()
+
+        mat4.translate(mvMatrix, mvMatrix, [0.0, 0, 0.0])
+        //mvPushMatrix()
+        //mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rcube), [1.0, 0.0, 0.0])
+        //mat4.rotateX(mvMatrix, mvMatrix, glMatrix.toRadian(rcube))
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer)
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
+        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexColorBuffer)
+        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, cubeVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0)
         setMatrixUniforms()
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, triangleVertexPositionBuffer.numItems)
-        mvPopMatrix()
-        mat4.translate(mvMatrix, mvMatrix, [0.0, -4, 0.0])
-        mvPushMatrix()
-        //mat4.rotate(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare), [1.0, 0.0, 0.0])
-        //mat4.rotateX(mvMatrix, mvMatrix, glMatrix.toRadian(rSquare))
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer)
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0)
-        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexColorBuffer)
-        gl.vertexAttribPointer(shaderProgram.vertexColorAttribute, squareVertexColorBuffer.itemSize, gl.FLOAT, false, 0, 0)
-        setMatrixUniforms()
-        gl.drawArrays(gl.LINES, 0, squareVertexPositionBuffer.numItems)
-        mvPopMatrix()
+        gl.drawArrays(gl.LINES, 0, cubeVertexPositionBuffer.numItems)
       }
       var lastTime = 0
       function animate() {
@@ -288,7 +305,7 @@
         if (lastTime != 0) {
           var elapsed = timeNow - lastTime
           rTri += (90 * elapsed) / 1000.0
-          rSquare += (75 * elapsed) / 1000.0
+          rcube += (75 * elapsed) / 1000.0
         }
         lastTime = timeNow
       }
